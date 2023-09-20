@@ -1,13 +1,32 @@
 version: "3.8"
 services:
-  db:
+  auth-ms:
+    container_name: auth-ms
+    image: auth-ms
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-ms-db
+    environment:
+      - SERVER_URL=${AUTH_MS_SERVER_URL}
+      - AUTH_MS_DATABASE_URL=${AUTH_MS_DATABASE_URL}
+      - AUTH_MS_DATABASE_USERNAME=${AUTH_MS_DATABASE_USERNAME}
+      - AUTH_MS_DATABASE_PASSWORD=${AUTH_MS_DATABASE_PASSWORD}
+      - AUTH_MS_DATABASE_NAME=${AUTH_MS_DATABASE_NAME}
+      - AUTH_MS_DATABASE_DIALECT=postgres
+      - AUTH_MS_DATABASE_HOST=auth-ms-db
+      - AUTH_MS_DATABASE_PORT=5432
+
+  auth-ms-db:
+    container_name: auth-ms-db
     image: postgres:14.4
     restart: unless-stopped
 
     environment:
-      - POSTGRES_USER=${DATABASE_USERNAME}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=${AUTH_MS_DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${AUTH_MS_DATABASE_PASSWORD}
+      - POSTGRES_DB=${AUTH_MS_DATABASE_NAME}
 
     ports:
       - "5432:5432"

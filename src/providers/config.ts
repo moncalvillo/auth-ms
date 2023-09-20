@@ -1,11 +1,12 @@
 export const Config = {
   database: {
-    dialect: Bun.env.DATABASE_DIALECT ?? "postgres",
-    host: Bun.env.DATABASE_HOST ?? "localhost",
-    port: Bun.env.DATABASE_PORT ?? 5432,
-    username: Bun.env.DATABASE_USERNAME ?? "postgres",
-    password: Bun.env.DATABASE_PASSWORD ?? "postgres",
-    name: Bun.env.DATABASE_NAME ?? "postgres",
+    url: Bun.env.AUTH_MS_DATABASE_URL,
+    dialect: Bun.env.AUTH_MS_DATABASE_DIALECT ?? "postgres",
+    host: Bun.env.AUTH_MS_DATABASE_HOST ?? "auth-ms-db",
+    port: Bun.env.AUTH_MS_DATABASE_PORT ?? 5432,
+    username: Bun.env.AUTH_MS_DATABASE_USERNAME ?? "auth_user",
+    password: Bun.env.AUTH_MS_DATABASE_PASSWORD ?? "auth_user_password",
+    name: Bun.env.AUTH_MS_DATABASE_NAME ?? "auth_database",
   },
   nodeEnv: Bun.env.NODE_ENV ?? "development",
   server: {
