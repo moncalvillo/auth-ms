@@ -9,19 +9,20 @@ import {
   DeletedAt,
 } from "sequelize-typescript";
 
-export interface IUserModel {
+export type IUserModel = Partial<{
   id: string;
-  name?: string | null;
-  surname?: string | null;
-  nickname?: string | null;
-  password: string | null;
-  email?: string | null;
-  profilePictureUrl?: string | null;
-}
+  name: string;
+  surname: string;
+  nickname: string;
+  password: string;
+  email: string;
+  profilePictureUrl: string;
+}>;
 
 @Table({
   timestamps: true,
   paranoid: true,
+  tableName: "users",
 })
 export class User extends Model<IUserModel> {
   @PrimaryKey
@@ -33,7 +34,7 @@ export class User extends Model<IUserModel> {
   public declare id: string;
 
   @Column({ type: DataType.STRING, allowNull: true })
-  public declare name?: string;
+  public declare firstname?: string;
 
   @Column({ type: DataType.STRING, allowNull: true })
   public declare surname?: string;
@@ -45,7 +46,7 @@ export class User extends Model<IUserModel> {
   public declare nickname?: string;
 
   @Column({ type: DataType.STRING, allowNull: false })
-  public declare password: string;
+  public declare password?: string;
 
   @Column({ type: DataType.STRING, allowNull: true })
   public declare profilePictureUrl?: string;

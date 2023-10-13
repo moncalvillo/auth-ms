@@ -1,8 +1,8 @@
 import { UuidService } from "utils/uuid.service";
 import { IUserModel, User } from "./user.model";
 import { AuthHelper } from "core/auth/auth.helper";
-import { CodedError, ErrorCodes } from "utils/codedError";
-import { Op } from "sequelize";
+import { FindOptions, Op, WhereOptions } from "sequelize";
+import { NotFoundError } from "shared/customErros";
 
 export class UserService {
   createUser = async (userData: Omit<IUserModel, "id">): Promise<User> => {
@@ -11,7 +11,7 @@ export class UserService {
     if (userData.password)
       userData.password = await AuthHelper.encryptPassword(userData.password);
 
-    await this.checkEmailAndNicknameExists(userData.email, userData.nickname);
+    await this.getUserByEmailOrNickname(userData.email, userData.nickname);
 
     const user = await User.create({
       ...userData,
@@ -22,7 +22,7 @@ export class UserService {
 
   getUserById = async (id: string): Promise<User> => {
     const user = await User.findByPk(id);
-    if (!user) throw new CodedError(ErrorCodes.NOT_FOUND, "User not found");
+    if (!user) throw new NotFoundError("User not found");
     return user;
   };
 
@@ -35,7 +35,7 @@ export class UserService {
         exclude: [...excludeAttrs],
       },
     });
-    if (!user) throw new CodedError(ErrorCodes.NOT_FOUND, "User not found");
+    if (!user) throw new NotFoundError("User not found");
     return user;
   };
 
@@ -56,62 +56,32 @@ export class UserService {
     return user;
   };
 
-  checkEmailAndNicknameExists = async (
-    email?: string | null,
-    nickname?: string | null
-  ): Promise<void> => {
-    const whereConditions: any = {};
-    if (email && email !== null) whereConditions.email = email;
-    if (nickname && nickname !== null) whereConditions.nickname = nickname;
+  findUser = async (options: FindOptions) => {
+    return await User.findOne(options);
+  };
 
-    if (email === null && nickname === null)
-      throw new CodedError(
-        ErrorCodes.BAD_REQUEST,
-        "Both email and nickname cannot be null"
-      );
+  findUserByEmailOrNickname = async (
+    email?: string,
+    nickname?: string
+  ): Promise<User | null> => {
+    const whereConditions: WhereOptions = {};
 
-    let queryCondition;
-    if (email !== null && nickname !== null) {
-      queryCondition = {
-        [Op.and]: whereConditions,
-      };
-    } else {
-      queryCondition = whereConditions;
-    }
+    if (!!email) whereConditions.email = email;
+    if (!!nickname) whereConditions.nickname = nickname;
 
-    const user = await User.findOne({
-      where: queryCondition,
+    const user = await this.findUser({
+      where: { [Op.or]: whereConditions },
     });
 
-    if (user)
-      throw new CodedError(
-        ErrorCodes.FORBIDDEN,
-        "Email or nickname already taken"
-      );
+    return user;
   };
 
   getUserByEmailOrNickname = async (
-    email: string | null = null,
-    nickname: string | null = null
+    email?: string,
+    nickname?: string
   ): Promise<User> => {
-    const whereConditions: any = {};
-
-    if (email !== null) whereConditions.email = email;
-
-    if (nickname !== null) whereConditions.nickname = nickname;
-
-    if (email === null && nickname === null)
-      throw new CodedError(
-        ErrorCodes.BAD_REQUEST,
-        "Both email and nickname cannot be null"
-      );
-
-    const user = await User.findOne({
-      where: whereConditions,
-    });
-
-    if (!user) throw new CodedError(ErrorCodes.NOT_FOUND, "Wrong credentials");
-
+    const user = await this.findUserByEmailOrNickname(email, nickname);
+    if (!user) throw new NotFoundError("User not found");
     return user;
   };
 }

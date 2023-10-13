@@ -5,9 +5,9 @@ services:
     image: auth-ms
     build: .
     ports:
-      - "8080:8080"
-    depends_on:
-      - auth-ms-db
+      - "8081:8081"
+    # depends_on:
+    #   - auth-ms-db
     environment:
       - SERVER_URL=${AUTH_MS_SERVER_URL}
       - AUTH_MS_DATABASE_URL=${AUTH_MS_DATABASE_URL}
@@ -18,20 +18,20 @@ services:
       - AUTH_MS_DATABASE_HOST=auth-ms-db
       - AUTH_MS_DATABASE_PORT=5432
 
-  auth-ms-db:
-    container_name: auth-ms-db
-    image: postgres:14.4
-    restart: unless-stopped
+  # auth-ms-db:
+  #   container_name: auth-ms-db
+  #   image: postgres:14.4
+  #   restart: unless-stopped
 
-    environment:
-      - POSTGRES_USER=${AUTH_MS_DATABASE_USERNAME}
-      - POSTGRES_PASSWORD=${AUTH_MS_DATABASE_PASSWORD}
-      - POSTGRES_DB=${AUTH_MS_DATABASE_NAME}
+  #   environment:
+  #     - POSTGRES_USER=${AUTH_MS_DATABASE_USERNAME}
+  #     - POSTGRES_PASSWORD=${AUTH_MS_DATABASE_PASSWORD}
+  #     - POSTGRES_DB=${AUTH_MS_DATABASE_NAME}
 
-    ports:
-      - "5432:5432"
-    volumes:
-      - db:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - db:/var/lib/postgresql/data
 volumes:
   db:
     driver: local

@@ -23,7 +23,6 @@ export class SequelizeClass {
 
   private static initSequelize(): Sequelize {
     if (Config.database.url) {
-      console.log("URL");
       const sequelize = new Sequelize(Config.database.url, {
         ssl: true,
         models: models,
@@ -36,31 +35,25 @@ export class SequelizeClass {
         logging: Config.nodeEnv === "development",
       } as SequelizeOptions);
 
-      console.log({
-        name: sequelize.getDatabaseName(),
-        options: sequelize.options,
-      });
       return sequelize;
-    } else {
-      console.log("NO URL");
-      return new Sequelize({
-        ssl: true,
-        dialectOptions: {
-          ssl: {
-            require: true,
-            rejectUnauthorized: Config.nodeEnv !== "development",
-          },
-        },
-        host: Config.database.host,
-        port: Config.database.port,
-        username: Config.database.username,
-        password: Config.database.password,
-        database: Config.database.name,
-        dialect: Config.database.dialect,
-        models: models,
-        logging: Config.nodeEnv === "development",
-      } as SequelizeOptions);
     }
+    return new Sequelize({
+      ssl: true,
+      dialectOptions: {
+        ssl: {
+          require: true,
+          rejectUnauthorized: Config.nodeEnv !== "development",
+        },
+      },
+      host: Config.database.host,
+      port: Config.database.port,
+      username: Config.database.username,
+      password: Config.database.password,
+      database: Config.database.name,
+      dialect: Config.database.dialect,
+      models: models,
+      logging: Config.nodeEnv === "development",
+    } as SequelizeOptions);
   }
 
   static getInstance() {

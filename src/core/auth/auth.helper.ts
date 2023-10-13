@@ -1,27 +1,29 @@
 import * as jose from "jose";
 import { Config } from "providers/config";
-import { CodedError, ErrorCodes } from "utils/codedError";
+import {
+  AuthenticationError,
+  ErrorCode,
+  ValidationError,
+} from "shared/customErros";
 export class AuthHelper {
   public static validateEmail(email: string): boolean {
-    if (!email)
-      throw new CodedError(ErrorCodes.BAD_REQUEST, "Email is required");
+    if (!email) throw new ValidationError("Email is required");
     const regex = /\S+@\S+\.\S+/;
     const valid = regex.test(email);
     if (!valid) {
-      throw new CodedError(ErrorCodes.BAD_REQUEST, "Invalid email");
+      throw new ValidationError("Invalid email");
     }
     return valid;
   }
 
   public static async validatePassword(
-    password: string,
-    hashedPassword: string
+    password?: string,
+    hashedPassword?: string
   ): Promise<void> {
-    if (!password)
-      throw new CodedError(ErrorCodes.BAD_REQUEST, "Password is required");
+    if (!hashedPassword) return;
+    if (!password) throw new ValidationError("Password is required");
     const valid = await this.isCorrectPassword(password, hashedPassword);
-    if (!valid)
-      throw new CodedError(ErrorCodes.BAD_REQUEST, "Wrong credentials");
+    if (!valid) throw new AuthenticationError("Wrong credentials");
   }
 
   public static jwtDecode(token: string): any {
@@ -53,7 +55,7 @@ export class AuthHelper {
 
   public static async verifyToken(token: string): Promise<any> {
     const secret = new TextEncoder().encode(Config.jwt.secret);
-    const { payload, protectedHeader } = await jose.jwtVerify(token, secret, {
+    const { payload } = await jose.jwtVerify(token, secret, {
       algorithms: ["HS256"],
     });
 
