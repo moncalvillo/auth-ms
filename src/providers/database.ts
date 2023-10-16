@@ -12,7 +12,9 @@ export class SequelizeClass {
         this.instance = this.initSequelize();
         await this.instance.authenticate();
         console.log("Sequelize initialized.");
-        await this.instance.sync();
+        await this.instance.sync({
+          logging: Config.nodeEnv === "development" ? console.log : false,
+        });
         console.log("Sequelize models synchronized with the database.");
       } catch (e) {
         console.error("Failed to initialize Sequelize.");
@@ -32,7 +34,7 @@ export class SequelizeClass {
             rejectUnauthorized: Config.nodeEnv !== "development",
           },
         },
-        logging: Config.nodeEnv === "development",
+        logging: Config.nodeEnv === "development" ? console.log : false,
       } as SequelizeOptions);
 
       return sequelize;
@@ -52,7 +54,7 @@ export class SequelizeClass {
       database: Config.database.name,
       dialect: Config.database.dialect,
       models: models,
-      logging: Config.nodeEnv === "development",
+      logging: Config.nodeEnv === "development" ? console.log : false,
     } as SequelizeOptions);
   }
 

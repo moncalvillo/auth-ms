@@ -7,6 +7,7 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ) => {
+  console.error(err.stack);
   if (err instanceof CodedError) {
     res.status(err.statusCode).json({ message: err.message });
   } else {
