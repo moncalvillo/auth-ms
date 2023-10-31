@@ -14,6 +14,7 @@ class AuthController {
         profilePictureUrl,
         nickname,
       });
+
       return res.status(201).json({ token });
     } catch (e) {
       next(e);
@@ -27,6 +28,11 @@ class AuthController {
   };
 
   refreshToken = (req: Request, res: Response) => {};
+  verifyToken = async (req: Request, res: Response) => {
+    const { token } = req.body;
+    const isValid = await authService.verifyToken(token);
+    return res.status(200).json({ isValid });
+  };
 }
 
 export const authController = new AuthController();

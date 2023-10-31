@@ -2,7 +2,11 @@ import { UuidService } from "utils/uuid.service";
 import { IUserModel, User } from "./user.model";
 import { AuthHelper } from "core/auth/auth.helper";
 import { FindOptions, Op, WhereOptions } from "sequelize";
-import { AuthenticationError, NotFoundError } from "shared/customErros";
+import {
+  AuthenticationError,
+  NotFoundError,
+  ValidationError,
+} from "shared/customErros";
 
 export class UserService {
   createUser = async (userData: Omit<IUserModel, "id">): Promise<User> => {

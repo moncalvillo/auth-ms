@@ -31,10 +31,11 @@ export class SequelizeClass {
         dialectOptions: {
           ssl: {
             require: true,
-            rejectUnauthorized: Config.nodeEnv !== "development",
+            rejectUnauthorized: false,
           },
         },
-        logging: Config.nodeEnv === "development" ? console.log : false,
+
+        logging: Config.nodeEnv !== "development" ? false : console.log,
       } as SequelizeOptions);
 
       return sequelize;

@@ -13,6 +13,7 @@ export class AuthRouter {
     this.router.post("/login", authController.login);
     this.router.post("/register", authController.register);
     this.router.post("/refresh-token", authController.refreshToken);
+    this.router.post("/verify-token", authController.verifyToken);
   }
 }
 

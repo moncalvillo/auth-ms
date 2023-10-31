@@ -1,10 +1,11 @@
-import * as jose from "jose";
 import { Config } from "providers/config";
 import {
   AuthenticationError,
   ErrorCode,
   ValidationError,
 } from "shared/customErros";
+
+import jwt from "jsonwebtoken";
 export class AuthHelper {
   public static validateEmail(email: string): boolean {
     if (!email) throw new ValidationError("Email is required");
@@ -27,15 +28,17 @@ export class AuthHelper {
   }
 
   public static jwtDecode(token: string): any {
-    const decoded = jose.decodeJwt(token);
+    const decoded = jwt.decode(token);
     return decoded;
   }
 
-  public static async generateToken(object: any): Promise<string> {
-    const secret = new TextEncoder().encode(Config.jwt.secret);
-    const token = await new jose.SignJWT(object)
-      .setProtectedHeader({ alg: "HS256" })
-      .sign(secret);
+  public static generateToken(object: any): string {
+    const secret = Config.jwt.secret;
+    const token = jwt.sign(object, secret, {
+      expiresIn: "1h",
+      algorithm: "HS256",
+    });
+
     return token;
   }
 
@@ -54,8 +57,7 @@ export class AuthHelper {
   }
 
   public static async verifyToken(token: string): Promise<any> {
-    const secret = new TextEncoder().encode(Config.jwt.secret);
-    const { payload } = await jose.jwtVerify(token, secret, {
+    const payload = await jwt.verify(token, Config.jwt.secret, {
       algorithms: ["HS256"],
     });
 

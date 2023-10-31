@@ -1,8 +1,8 @@
-FROM oven/bun:0.5.9
+FROM oven/bun:1.0.1
 WORKDIR /app
 COPY package*.json ./
 COPY bun.lockb bun.lockb
 RUN bun install
 COPY . .
-EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["bun", "index.ts"]

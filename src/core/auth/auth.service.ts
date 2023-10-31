@@ -17,6 +17,11 @@ export class AuthService {
     const token = await AuthHelper.generateToken(userNoPassword);
     return { token };
   };
+
+  verifyToken = async (token: string) => {
+    return !!(await AuthHelper.verifyToken(token));
+  };
+
   refreshToken = (data: any) => {};
 }
 

@@ -17,21 +17,6 @@ services:
       - AUTH_MS_DATABASE_DIALECT=postgres
       - AUTH_MS_DATABASE_HOST=auth-ms-db
       - AUTH_MS_DATABASE_PORT=5432
-
-  # auth-ms-db:
-  #   container_name: auth-ms-db
-  #   image: postgres:14.4
-  #   restart: unless-stopped
-
-  #   environment:
-  #     - POSTGRES_USER=${AUTH_MS_DATABASE_USERNAME}
-  #     - POSTGRES_PASSWORD=${AUTH_MS_DATABASE_PASSWORD}
-  #     - POSTGRES_DB=${AUTH_MS_DATABASE_NAME}
-
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - db:/var/lib/postgresql/data
 volumes:
   db:
     driver: local

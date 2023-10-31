@@ -20,7 +20,6 @@ export class AuhtServer {
 
     this.app.use("/auth", authRouter.router);
     this.app.use("/users", userRouter.router);
-
     this.app.use(errorHandler);
 
     this.app.listen(Config.server.port, () => {
@@ -32,12 +31,3 @@ export class AuhtServer {
 }
 
 export default new AuhtServer();
-
-// const server = Bun.serve({
-//   development: Config.nodeEnv !== "production" ?? false,
-//   port: Config.server.port,
-//   fetch: Router.handleRequest,
-//   error(req) {
-//     return Router.handleError(this, req);
-//   },
-// });
