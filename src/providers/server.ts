@@ -1,9 +1,10 @@
 import { authRouter } from "core/auth/auth.router";
 import { Config } from "./config";
-import { SequelizeClass } from "./database";
+import { MongooseClass, SequelizeClass } from "./database";
 import express from "express";
 import { userRouter } from "core/user/user.router";
 import { errorHandler } from "core/middlewares/error/error.handler";
+import { applicationsRouter } from "core/applications/applications.router";
 
 export class AuhtServer {
   private app: express.Application;
@@ -13,10 +14,14 @@ export class AuhtServer {
   }
 
   public async init() {
-    await SequelizeClass.init();
+    // await SequelizeClass.init();
+    await MongooseClass.init();
 
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
+
+    this.app.set("trust proxy", true);
+    this.app.use("/applications", applicationsRouter.router);
 
     this.app.use("/auth", authRouter.router);
     this.app.use("/users", userRouter.router);
