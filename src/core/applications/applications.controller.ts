@@ -8,7 +8,8 @@ class ApplicationsController {
     next: NextFunction
   ) => {
     try {
-      const { name, url, description, redirectUrl } = req.body;
+      const { name, url, description, redirectUrl, schemaDefinition } =
+        req.body;
       const ip = req.ip || req.headers["x-forwarded-for"]?.[0];
       const domain = req.headers.host;
 
@@ -18,6 +19,7 @@ class ApplicationsController {
         description,
         redirectUrl,
         ip,
+        schemaDefinition,
         domain,
       });
 

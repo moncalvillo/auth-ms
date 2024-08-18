@@ -1,34 +1,64 @@
 import { CryptoService } from "utils/crypto.service";
-import { ApiKey, Application, IApplicationModel } from "./applications.model";
-import { NotFoundError } from "shared/customErros";
+import { CodedError, NotFoundError, ValidationError } from "shared/customErros";
+
+import {
+  Application,
+  IApplication,
+  ApiKey,
+  IApplicationDocument,
+} from "./applications.model-mon";
+import { generateMongooseModel } from "utils/generateDynamicSchema";
+import mongoose, { omitUndefined } from "mongoose";
+import { MongooseClass } from "providers/database";
 
 export class ApplicationsService {
   registerApplication = async (
-    data: IApplicationModel
+    data: Partial<IApplication>
   ): Promise<{ apiKey: string }> => {
-    const { name, url, description, redirectUrl, domain, ip } = data;
-
-    const application = await Application.create({
+    const {
       name,
       url,
       description,
-      domain,
       redirectUrl,
+      domain,
       ip,
-    });
+      schemaDefinition,
+    } = data;
 
-    const apiKey = this.generateApiKey(application.id);
+    if (!name || !schemaDefinition)
+      throw new ValidationError("Name and schemaDefinition are required");
 
-    await this.saveApiKey(application.id, apiKey);
+    try {
+      const application = new Application({
+        name,
+        url,
+        description,
+        domain,
+        redirectUrl,
+        schemaDefinition,
+        ip,
+      });
+      await application.save({
+        validateBeforeSave: false,
+      });
 
-    return { apiKey };
+      const appModel = await generateMongooseModel(name, schemaDefinition);
+      await appModel.createCollection();
+
+      const apiKey = this.generateApiKey(application.id);
+      await this.saveApiKey(application.id, apiKey);
+
+      return { apiKey };
+    } catch (e: any) {
+      throw new CodedError(500, e.message);
+    }
   };
 
   getApplicationApiKey = async (appId: string): Promise<string> => {
     const application = await this.findApplicationById(appId);
     const apiKey = await ApiKey.findOne({
       where: {
-        applicationId: application.id,
+        applicationId: application._id,
         isActive: true,
       },
     });
@@ -45,8 +75,10 @@ export class ApplicationsService {
     return apiKey;
   };
 
-  findApplicationById = async (appId: string): Promise<Application> => {
-    const application = await Application.findByPk(appId);
+  findApplicationById = async (
+    appId: string
+  ): Promise<IApplicationDocument> => {
+    const application = await Application.findById(appId);
     if (!application) {
       throw new NotFoundError(`Application with id ${appId} not found`);
     }
@@ -59,7 +91,7 @@ export class ApplicationsService {
       key: apiKey,
       expiryDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
     });
-    await ApiKey.update(
+    await ApiKey.updateOne(
       { isActive: false },
       {
         where: {

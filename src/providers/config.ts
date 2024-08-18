@@ -1,6 +1,8 @@
 export const Config = {
   database: {
-    url: Bun.env.AUTH_MS_DATABASE_URL,
+    url: Bun.env.AUTH_MS_DATABASE_URL ?? "",
+    generalUrl: Bun.env.AUTH_MS_DATABASE_GENERAL_URL,
+    appsUrl: Bun.env.AUTH_MS_DATABASE_APPS_URL,
     dialect: Bun.env.AUTH_MS_DATABASE_DIALECT ?? "postgres",
     host: Bun.env.AUTH_MS_DATABASE_HOST ?? "auth-ms-db",
     port: Bun.env.AUTH_MS_DATABASE_PORT ?? 5432,

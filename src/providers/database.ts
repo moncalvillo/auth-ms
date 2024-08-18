@@ -1,7 +1,7 @@
 import { Sequelize, SequelizeOptions } from "sequelize-typescript";
 import { Config } from "./config";
 import { models } from "core";
-import { Mongoose } from "mongoose";
+import mongoose, { Connection, ConnectOptions, Mongoose } from "mongoose";
 
 export class SequelizeClass {
   private static instance: Sequelize;
@@ -69,12 +69,16 @@ export class SequelizeClass {
 }
 
 export class MongooseClass {
-  private static instance: Mongoose;
+  private static instance: {
+    general: Connection;
+    apps: Connection;
+  };
 
-  static async init() {
+  static init() {
     if (!MongooseClass.instance) {
       try {
-        this.instance = await this.initMongoose();
+        this.instance = this.initMongoose();
+        return this.instance;
       } catch (e) {
         console.error("Failed to initialize Mongoose.");
         console.error(e);
@@ -82,23 +86,46 @@ export class MongooseClass {
     }
   }
 
-  private static async initMongoose(): Promise<Mongoose> {
-    console.log(Config);
-    const mongooseObject = new Mongoose();
-    if (!Config.database.url) {
+  private static initMongoose(): {
+    general: Connection;
+    apps: Connection;
+  } {
+    console.log("Initializing Mongoose...");
+    if (!Config.database.generalUrl || !Config.database.appsUrl) {
       throw new Error("Database URL not provided.");
     }
-    const mongooseInstance = await mongooseObject.connect(Config.database.url);
-    if (!mongooseInstance) {
+    const general = mongoose.createConnection(Config.database.generalUrl);
+    const apps = mongoose.createConnection(Config.database.appsUrl);
+    const mongooseInstance = {
+      general,
+      apps,
+    };
+
+    if (!mongooseInstance.general || !mongooseInstance.apps) {
       throw new Error("Failed to connect to the database.");
     }
+    console.log("Mongoose initialized.");
     return mongooseInstance;
   }
 
-  static async getInstance() {
+  static getInstance() {
     if (!MongooseClass.instance) {
-      await MongooseClass.init();
+      return MongooseClass.init();
     }
     return MongooseClass.instance;
+  }
+
+  static getGeneralConnection() {
+    if (!MongooseClass.instance) {
+      return MongooseClass.init()!.general;
+    }
+    return MongooseClass.instance?.general;
+  }
+
+  static getAppsConnection() {
+    if (!MongooseClass.instance) {
+      return MongooseClass.init()!.general;
+    }
+    return MongooseClass.instance?.apps;
   }
 }
