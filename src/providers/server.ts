@@ -3,7 +3,7 @@ import { Config } from "./config";
 import { MongooseClass, SequelizeClass } from "./database";
 import express from "express";
 import { userRouter } from "core/user/user.router";
-import { errorHandler } from "core/middlewares/error/error.handler";
+import { errorHandler } from "core/middlewares/error.handler";
 import { applicationsRouter } from "core/applications/applications.router";
 
 export class AuhtServer {

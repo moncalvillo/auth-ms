@@ -7,7 +7,14 @@ export interface IApplication {
   domain?: string;
   description?: string;
   redirectUrl?: string;
-  schemaDefinition: Record<string, string>;
+  schemaDefinition: Record<
+    string,
+    {
+      type: string;
+      required?: boolean;
+      unique?: boolean;
+    }
+  >;
   ip?: string;
 }
 
@@ -20,7 +27,15 @@ const applicationSchema = new Schema<IApplicationDocument>(
     domain: { type: String, required: false },
     description: { type: String, required: false },
     redirectUrl: { type: String, required: false },
-    schemaDefinition: { type: Map, of: String, required: true },
+    schemaDefinition: {
+      type: Map,
+      of: new Schema({
+        type: { type: String, required: true },
+        required: { type: Boolean, required: false },
+        unique: { type: Boolean, required: false },
+      }),
+      required: true,
+    },
     ip: { type: String, required: false },
   },
   {
@@ -30,7 +45,7 @@ const applicationSchema = new Schema<IApplicationDocument>(
 
 export const Application =
   MongooseClass.getGeneralConnection()?.model<IApplicationDocument>(
-    "applications",
+    "Applications",
     applicationSchema
   );
 
@@ -57,6 +72,6 @@ const apiKeySchema = new Schema<IApiKeyDocument>(
 
 export const ApiKey =
   MongooseClass.getGeneralConnection()?.model<IApiKeyDocument>(
-    "ApiKey",
+    "ApiKeys",
     apiKeySchema
   );

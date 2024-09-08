@@ -4,7 +4,8 @@ import { AuthHelper } from "./auth.helper";
 
 export class AuthService {
   login = async (data: any): Promise<{ token: string }> => {
-    const { email, password, nickname } = data;
+    const { email, password, nickname, application } = data;
+
     const user = await userService.getUserByEmailOrNickname(email, nickname);
     await AuthHelper.validatePassword(password, user?.password);
     const { password: _, ...userNoPassword } = user?.toJSON();

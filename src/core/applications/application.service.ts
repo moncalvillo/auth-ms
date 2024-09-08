@@ -38,9 +38,13 @@ export class ApplicationsService {
         schemaDefinition,
         ip,
       });
-      await application.save({
-        validateBeforeSave: false,
-      });
+
+      // first look for the application in the database
+      const existingApp = await Application.findOne({ name });
+      if (existingApp)
+        throw new ValidationError("Application with this name already exists");
+
+      await application.save();
 
       const appModel = await generateMongooseModel(name, schemaDefinition);
       await appModel.createCollection();
@@ -50,7 +54,11 @@ export class ApplicationsService {
 
       return { apiKey };
     } catch (e: any) {
-      throw new CodedError(500, e.message);
+      if (e instanceof CodedError) {
+        throw e;
+      } else {
+        throw new CodedError(500, e.message);
+      }
     }
   };
 

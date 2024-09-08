@@ -23,7 +23,13 @@ class AuthController {
 
   login = async (req: Request, res: Response) => {
     const { email, password, nickname } = req.body;
-    const { token } = await authService.login({ email, password, nickname });
+
+    const { token } = await authService.login({
+      email,
+      password,
+      nickname,
+      application: req.application,
+    });
     return res.status(200).json({ token });
   };
 
