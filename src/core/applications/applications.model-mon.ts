@@ -3,6 +3,7 @@ import { MongooseClass } from "providers/database";
 
 export interface IApplication {
   name: string;
+  contactEmail?: string;
   url?: string;
   domain?: string;
   description?: string;
@@ -23,6 +24,7 @@ export interface IApplicationDocument extends Document, IApplication {}
 const applicationSchema = new Schema<IApplicationDocument>(
   {
     name: { type: String, required: true, unique: true },
+    contactEmail: { type: String, required: false },
     url: { type: String, required: false },
     domain: { type: String, required: false },
     description: { type: String, required: false },
