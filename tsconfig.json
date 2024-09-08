@@ -17,7 +17,8 @@
       "esModuleInterop": true,
       "allowJs": true,
       "types": [
-        "bun-types" // add Bun global
+        "bun-types",
+        "express"
       ],
       "baseUrl": "./src",
       "experimentalDecorators": true,

@@ -2,16 +2,24 @@ import { UuidService } from "utils/uuid.service";
 import { IUserModel, User } from "./user.model";
 import { AuthHelper } from "core/auth/auth.helper";
 import { FindOptions, Op, WhereOptions } from "sequelize";
-import { NotFoundError } from "shared/customErros";
+import {
+  AuthenticationError,
+  NotFoundError,
+  ValidationError,
+} from "shared/customErros";
 
 export class UserService {
   createUser = async (userData: Omit<IUserModel, "id">): Promise<User> => {
-    console.log(userData);
     if (userData.email) AuthHelper.validateEmail(userData.email);
     if (userData.password)
       userData.password = await AuthHelper.encryptPassword(userData.password);
 
-    await this.getUserByEmailOrNickname(userData.email, userData.nickname);
+    const existingUser = await this.findUserByEmailOrNickname(
+      userData.email,
+      userData.nickname
+    );
+
+    if (existingUser) throw new AuthenticationError("User already exists");
 
     const user = await User.create({
       ...userData,
