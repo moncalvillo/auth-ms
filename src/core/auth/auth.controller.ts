@@ -21,16 +21,19 @@ class AuthController {
     }
   };
 
-  login = async (req: Request, res: Response) => {
+  login = async (req: Request, res: Response, next: NextFunction) => {
     const { email, password, nickname } = req.body;
-
-    const { token } = await authService.login({
-      email,
-      password,
-      nickname,
-      application: req.application,
-    });
-    return res.status(200).json({ token });
+    try {
+      const { token } = await authService.login({
+        email,
+        password,
+        nickname,
+        application: req.application,
+      });
+      return res.status(200).json({ token });
+    } catch (e) {
+      next(e);
+    }
   };
 
   refreshToken = (req: Request, res: Response) => {};

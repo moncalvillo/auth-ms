@@ -6,7 +6,7 @@ import { userRouter } from "core/user/user.router";
 import { errorHandler } from "core/middlewares/error.handler";
 import { applicationsRouter } from "core/applications/applications.router";
 
-export class AuhtServer {
+export class AuthServer {
   private app: express.Application;
 
   constructor() {
@@ -35,4 +35,4 @@ export class AuhtServer {
   }
 }
 
-export default new AuhtServer();
+export default new AuthServer();

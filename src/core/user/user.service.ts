@@ -7,6 +7,9 @@ import {
   NotFoundError,
   ValidationError,
 } from "shared/customErros";
+import { IApplicationDocument } from "core/applications/applications.model-mon";
+import { application } from "express";
+import { generateMongooseModel } from "utils/generateDynamicSchema";
 
 export class UserService {
   createUser = async (userData: Omit<IUserModel, "id">): Promise<User> => {
@@ -69,10 +72,13 @@ export class UserService {
   };
 
   findUserByEmailOrNickname = async (
+    // application: IApplicationDocument,
     email?: string,
     nickname?: string
   ): Promise<User | null> => {
     const whereConditions: WhereOptions = {};
+
+    // const model = generateMongooseModel(application.name, );
 
     if (!!email) whereConditions.email = email;
     if (!!nickname) whereConditions.nickname = nickname;
@@ -86,7 +92,8 @@ export class UserService {
 
   getUserByEmailOrNickname = async (
     email?: string,
-    nickname?: string
+    nickname?: string,
+    application?: IApplicationDocument
   ): Promise<User> => {
     const user = await this.findUserByEmailOrNickname(email, nickname);
     if (!user) throw new NotFoundError("User not found");

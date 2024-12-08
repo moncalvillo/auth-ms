@@ -1,3 +1,3 @@
-import AuhtServer from "providers/server";
+import AuthServer from "providers/server";
 
-AuhtServer.init();
+AuthServer.init();
